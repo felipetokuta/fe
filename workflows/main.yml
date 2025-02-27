@@ -1,0 +1,30 @@
+name: Windows-CRD
+
+on: 
+  workflow_dispatch:
+    inputs:
+      authcode:
+        description: 'Enter CRD code'
+        required: true
+      pincode:
+        description: 'Six digit Pin'
+        required: true
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setting Execution Policy
+        run: Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
+
+      - name: Initializing Setup
+        run: ./setup.ps1
+
+      - name: Starting CRD
+        run: Start-Process -FilePath 'C:\Program Files (x86)\Google\Chrome Remote Desktop\chrome_remote_desktop.exe' -ArgumentList "${{ github.event.inputs.authcode }} -pin=${{ github.event.inputs.pincode }}" -Wait
+
+      - name: Keep Alive
+        run: ./timeout.ps1
